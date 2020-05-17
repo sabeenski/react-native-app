@@ -1,19 +1,52 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
 
 export default function App() {
+  const [enteredGoal, setEnteredGoal] = useState('');
+  const [courseGoals, setCourseGoals] = useState([]);
+
+  const handleInput = (enteredText) => {
+    setEnteredGoal(enteredText);
+  };
+
+  const addGoal = () => {
+    console.log(enteredGoal);
+    setCourseGoals((currentGoals) => [...currentGoals, enteredGoal]);
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    <View style={styles.screen}>
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder='Course Goal?'
+          style={styles.input}
+          onChangeText={handleInput}
+          value={enteredGoal}
+        />
+        <Button title='ADD' onPress={addGoal} style={{ padding: 10 }} />
+      </View>
+      <View>
+        {courseGoals.map((goal, i) => (
+          <Text key={i}>{goal}</Text>
+        ))}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
+  screen: {
+    padding: 50,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
+  },
+  input: {
+    borderBottomColor: 'black',
+    borderWidth: 1,
+    padding: 10,
+    width: '80%',
   },
 });
