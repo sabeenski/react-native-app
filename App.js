@@ -1,35 +1,51 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, View, Button, FlatList } from 'react-native';
+import GoalItem from './components/GoalItem';
+import GoalInput from './components/GoalInput';
 
 export default function App() {
-  const [enteredGoal, setEnteredGoal] = useState('');
   const [courseGoals, setCourseGoals] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const handleInput = (enteredText) => {
-    setEnteredGoal(enteredText);
+  const addGoalHandler = (enteredGoal) => {
+    if (enteredGoal.length === 0) return;
+    setCourseGoals((currentGoals) => [
+      ...currentGoals,
+      {
+        id: Math.random().toString(),
+        value: enteredGoal,
+      },
+    ]);
+    setModalVisible((currentModal) => !currentModal);
   };
 
-  const addGoal = () => {
-    console.log(enteredGoal);
-    setCourseGoals((currentGoals) => [...currentGoals, enteredGoal]);
+  const removeGoalHandler = (goalId) => {
+    setCourseGoals((currentGoals) => {
+      return currentGoals.filter((item) => item.id !== goalId);
+    });
+  };
+
+  const showModalHandler = () => {
+    setModalVisible((currentModal) => !currentModal);
   };
 
   return (
     <View style={styles.screen}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder='Course Goal?'
-          style={styles.input}
-          onChangeText={handleInput}
-          value={enteredGoal}
-        />
-        <Button title='ADD' onPress={addGoal} style={{ padding: 10 }} />
-      </View>
-      <View>
-        {courseGoals.map((goal, i) => (
-          <Text key={i}>{goal}</Text>
-        ))}
-      </View>
+      <Button title='Add new goal' onPress={showModalHandler} />
+      <GoalInput
+        addGoal={addGoalHandler}
+        showModal={modalVisible}
+        closeModal={showModalHandler}
+      />
+      <FlatList // For getting a scrollable view for dynamic contents. This is better than ScrollView component.optimizes the view by loading only visible items
+        data={courseGoals}
+        renderItem={(itemData) => (
+          <GoalItem
+            title={itemData.item.value}
+            onDelete={() => removeGoalHandler(itemData.item.id)}
+          />
+        )}
+      />
     </View>
   );
 }
@@ -37,16 +53,5 @@ export default function App() {
 const styles = StyleSheet.create({
   screen: {
     padding: 50,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  input: {
-    borderBottomColor: 'black',
-    borderWidth: 1,
-    padding: 10,
-    width: '80%',
   },
 });
